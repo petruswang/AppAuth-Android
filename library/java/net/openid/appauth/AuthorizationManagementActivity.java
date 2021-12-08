@@ -145,6 +145,7 @@ public class AuthorizationManagementActivity extends AppCompatActivity {
     static final String KEY_AUTHORIZATION_STARTED = "authStarted";
 
     private boolean mAuthorizationStarted = false;
+    private boolean mNewIntentPassed = false;
     private Intent mAuthIntent;
     private AuthorizationManagementRequest mAuthRequest;
     private PendingIntent mCompleteIntent;
@@ -244,6 +245,13 @@ public class AuthorizationManagementActivity extends AppCompatActivity {
          * the back button, or closes the browser tab.
          */
 
+        /* If onNewIntent has not been called already, don't do anything and return.
+         * This is a work around for Android 12 (SDK 31) where onResume is called before onNewIntent.
+         */
+        if (!mNewIntentPassed) {
+            return;
+        }
+
         if (getIntent().getData() != null) {
             handleAuthorizationComplete();
         } else {
@@ -256,6 +264,7 @@ public class AuthorizationManagementActivity extends AppCompatActivity {
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         setIntent(intent);
+        mNewIntentPassed = true;
     }
 
     @Override
